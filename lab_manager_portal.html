@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lab Manager Portal</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #131a2e;
+      --panel-2: #1a2340;
+      --muted: #8ea0c9;
+      --text: #e8eeff;
+      --accent: #6ea8fe;
+      --accent-2: #73e0a9;
+      --danger: #ff7b7b;
+      --warn: #ffd166;
+      --border: rgba(255,255,255,0.08);
+      --shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: linear-gradient(180deg, #0a0f1c 0%, #11172b 100%);
+      color: var(--text);
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: 100vh;
+    }
+
+    aside {
+      background: rgba(8, 12, 24, 0.92);
+      border-right: 1px solid var(--border);
+      padding: 24px 18px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .brand-badge {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), #8a7dff);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      color: #08111f;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 1.05rem;
+      line-height: 1.1;
+    }
+
+    .brand small {
+      color: var(--muted);
+      display: block;
+      margin-top: 3px;
+    }
+
+    nav {
+      display: grid;
+      gap: 10px;
+    }
+
+    .nav-btn {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text);
+      text-align: left;
+      padding: 12px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .nav-btn.active,
+    .nav-btn:hover {
+      background: var(--panel-2);
+      border-color: rgba(110,168,254,0.35);
+    }
+
+    .side-note {
+      margin-top: 28px;
+      padding: 14px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.45;
+    }
+
+    main {
+      padding: 28px;
+    }
+
+    .topbar {
+      display: flex;
+      gap: 12px;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 22px;
+      flex-wrap: wrap;
+    }
+
+    .title-block h2 {
+      margin: 0 0 6px;
+      font-size: 1.7rem;
+    }
+
+    .title-block p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button, input, select, textarea {
+      font: inherit;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 12px;
+      padding: 11px 14px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #8a7dff);
+      color: #08111f;
+    }
+
+    .btn-secondary {
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-danger {
+      background: rgba(255,123,123,0.12);
+      color: #ffc2c2;
+      border: 1px solid rgba(255,123,123,0.25);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 18px;
+    }
+
+    .card {
+      background: rgba(19, 26, 46, 0.85);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .stat-card {
+      grid-column: span 3;
+      min-height: 120px;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin-bottom: 10px;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .stat-sub {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .panel-title {
+      margin: 0 0 14px;
+      font-size: 1.1rem;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 14px;
+    }
+
+    .field {
+      grid-column: span 4;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .field-wide { grid-column: span 6; }
+    .field-full { grid-column: span 12; }
+
+    label {
+      font-size: 0.92rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 11px 12px;
+      outline: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: rgba(110,168,254,0.55);
+      box-shadow: 0 0 0 3px rgba(110,168,254,0.14);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 96px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 860px;
+    }
+
+    th, td {
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 0.88rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .status-paid, .status-in-stock { background: rgba(115,224,169,0.15); color: #9ef1c3; }
+    .status-pending, .status-low-stock { background: rgba(255,209,102,0.15); color: #ffe29a; }
+    .status-overdue, .status-out-of-stock { background: rgba(255,123,123,0.14); color: #ffb3b3; }
+    .status-ordered { background: rgba(110,168,254,0.16); color: #bad4ff; }
+
+    .split {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 18px;
+    }
+
+    .filters {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .filters > * {
+      flex: 1 1 180px;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 24px 14px;
+      border: 1px dashed var(--border);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.02);
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    @media (max-width: 1100px) {
+      .stat-card { grid-column: span 6; }
+      .split { grid-template-columns: 1fr; }
+      .field, .field-wide { grid-column: span 6; }
+    }
+
+    @media (max-width: 780px) {
+      .app { grid-template-columns: 1fr; }
+      aside {
+        position: static;
+        height: auto;
+      }
+      .stat-card, .field, .field-wide, .field-full { grid-column: span 12; }
+      main { padding: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside>
+      <div class="brand">
+        <div class="brand-badge">LM</div>
+        <div>
+          <h1>Lab Manager Portal</h1>
+          <small>Invoices, reagents, and purchasing</small>
+        </div>
+      </div>
+
+      <nav>
+        <button class="nav-btn active" data-section="dashboard">Dashboard</button>
+        <button class="nav-btn" data-section="invoices">Invoices</button>
+        <button class="nav-btn" data-section="reagents">Reagents</button>
+        <button class="nav-btn" data-section="orders">Purchase Orders</button>
+      </nav>
+
+      <div class="side-note">
+        Your entries save in this browser using local storage. Use Export to back up your data as a JSON file.
+      </div>
+    </aside>
+
+    <main>
+      <div class="topbar">
+        <div class="title-block">
+          <h2>Operations Overview</h2>
+          <p>Track invoice status, monitor low-stock reagents, and keep purchasing organized.</p>
+        </div>
+        <div class="toolbar">
+          <button class="btn btn-secondary" id="seedDemoBtn">Load Demo Data</button>
+          <button class="btn btn-secondary" id="exportBtn">Export Data</button>
+          <label class="btn btn-secondary" for="importInput" style="display:inline-flex;align-items:center;gap:8px;">
+            Import Data
+          </label>
+          <input id="importInput" type="file" accept="application/json" hidden />
+          <button class="btn btn-danger" id="resetBtn">Reset All</button>
+        </div>
+      </div>
+
+      <section id="dashboard" class="section active">
+        <div class="grid" style="margin-bottom: 18px;">
+          <div class="card stat-card">
+            <div class="stat-label">Total invoices</div>
+            <div class="stat-value" id="statInvoices">0</div>
+            <div class="stat-sub">All invoice records entered</div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-label">Pending amount</div>
+            <div class="stat-value" id="statPendingAmount">$0.00</div>
+            <div class="stat-sub">Pending + overdue invoices</div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-label">Low stock reagents</div>
+            <div class="stat-value" id="statLowStock">0</div>
+            <div class="stat-sub">At or below reorder threshold</div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-label">Open purchase orders</div>
+            <div class="stat-value" id="statOpenOrders">0</div>
+            <div class="stat-sub">Requested or ordered, not completed</div>
+          </div>
+        </div>
+
+        <div class="split">
+          <div class="card">
+            <h3 class="panel-title">Recent invoices</h3>
+            <div id="recentInvoices"></div>
+          </div>
+          <div class="card">
+            <h3 class="panel-title">Reagents needing attention</h3>
+            <div id="attentionReagents"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="invoices" class="section">
+        <div class="split">
+          <div class="card">
+            <h3 class="panel-title">Add invoice</h3>
+            <form id="invoiceForm" class="form-grid">
+              <div class="field"><label>Vendor</label><input name="vendor" required /></div>
+              <div class="field"><label>Invoice #</label><input name="invoiceNumber" required /></div>
+              <div class="field"><label>Amount ($)</label><input name="amount" type="number" min="0" step="0.01" required /></div>
+              <div class="field"><label>Invoice date</label><input name="invoiceDate" type="date" required /></div>
+              <div class="field"><label>Due date</label><input name="dueDate" type="date" required /></div>
+              <div class="field"><label>Status</label>
+                <select name="status" required>
+                  <option value="Pending">Pending</option>
+                  <option value="Paid">Paid</option>
+                  <option value="Overdue">Overdue</option>
+                </select>
+              </div>
+              <div class="field-full"><label>Notes</label><textarea name="notes" placeholder="PO number, account, department, shipping details, etc."></textarea></div>
+              <div class="field-full"><button class="btn btn-primary" type="submit">Save invoice</button></div>
+            </form>
+          </div>
+
+          <div class="card">
+            <h3 class="panel-title">Invoice records</h3>
+            <div class="filters">
+              <input id="invoiceSearch" placeholder="Search vendor, invoice #, notes..." />
+              <select id="invoiceStatusFilter">
+                <option value="All">All statuses</option>
+                <option value="Pending">Pending</option>
+                <option value="Paid">Paid</option>
+                <option value="Overdue">Overdue</option>
+              </select>
+            </div>
+            <div class="table-wrap" id="invoiceTableWrap"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="reagents" class="section">
+        <div class="split">
+          <div class="card">
+            <h3 class="panel-title">Add reagent</h3>
+            <form id="reagentForm" class="form-grid">
+              <div class="field"><label>Reagent name</label><input name="name" required /></div>
+              <div class="field"><label>Vendor</label><input name="vendor" required /></div>
+              <div class="field"><label>Catalog #</label><input name="catalogNumber" /></div>
+              <div class="field"><label>Quantity on hand</label><input name="quantity" type="number" min="0" step="1" required /></div>
+              <div class="field"><label>Unit</label><input name="unit" placeholder="bottles, kits, boxes, tubes" required /></div>
+              <div class="field"><label>Reorder threshold</label><input name="threshold" type="number" min="0" step="1" required /></div>
+              <div class="field"><label>Expiration date</label><input name="expiration" type="date" /></div>
+              <div class="field"><label>Storage</label><input name="storage" placeholder="RT, 4°C, -20°C" /></div>
+              <div class="field"><label>Status</label>
+                <select name="status" required>
+                  <option value="In Stock">In Stock</option>
+                  <option value="Low Stock">Low Stock</option>
+                  <option value="Out of Stock">Out of Stock</option>
+                  <option value="Ordered">Ordered</option>
+                </select>
+              </div>
+              <div class="field-full"><label>Notes</label><textarea name="notes" placeholder="Lot number, location, project usage, safety notes, etc."></textarea></div>
+              <div class="field-full"><button class="btn btn-primary" type="submit">Save reagent</button></div>
+            </form>
+          </div>
+
+          <div class="card">
+            <h3 class="panel-title">Reagent inventory</h3>
+            <div class="filters">
+              <input id="reagentSearch" placeholder="Search reagent, vendor, catalog #..." />
+              <select id="reagentStatusFilter">
+                <option value="All">All statuses</option>
+                <option value="In Stock">In Stock</option>
+                <option value="Low Stock">Low Stock</option>
+                <option value="Out of Stock">Out of Stock</option>
+                <option value="Ordered">Ordered</option>
+              </select>
+            </div>
+            <div class="table-wrap" id="reagentTableWrap"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="orders" class="section">
+        <div class="split">
+          <div class="card">
+            <h3 class="panel-title">Add purchase order</h3>
+            <form id="orderForm" class="form-grid">
+              <div class="field"><label>Requested item</label><input name="item" required /></div>
+              <div class="field"><label>Vendor</label><input name="vendor" required /></div>
+              <div class="field"><label>Estimated cost ($)</label><input name="cost" type="number" min="0" step="0.01" required /></div>
+              <div class="field"><label>Request date</label><input name="requestDate" type="date" required /></div>
+              <div class="field"><label>Status</label>
+                <select name="status" required>
+                  <option value="Requested">Requested</option>
+                  <option value="Ordered">Ordered</option>
+                  <option value="Received">Received</option>
+                  <option value="Cancelled">Cancelled</option>
+                </select>
+              </div>
+              <div class="field"><label>Requested by</label><input name="requester" /></div>
+              <div class="field-full"><label>Notes</label><textarea name="notes" placeholder="Grant, project, justification, shipping notes, etc."></textarea></div>
+              <div class="field-full"><button class="btn btn-primary" type="submit">Save purchase order</button></div>
+            </form>
+          </div>
+
+          <div class="card">
+            <h3 class="panel-title">Purchase order tracker</h3>
+            <div class="filters">
+              <input id="orderSearch" placeholder="Search item, vendor, requester..." />
+              <select id="orderStatusFilter">
+                <option value="All">All statuses</option>
+                <option value="Requested">Requested</option>
+                <option value="Ordered">Ordered</option>
+                <option value="Received">Received</option>
+                <option value="Cancelled">Cancelled</option>
+              </select>
+            </div>
+            <div class="table-wrap" id="orderTableWrap"></div>
+          </div>
+        </div>
+      </section>
+
+      <div class="footer-note">
+        Built as a lightweight local web app for lab operations. You can later connect it to Google Sheets, Airtable, SQL, or a cloud database.
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const storageKey = 'labManagerPortalData_v1';
+
+    const state = loadState();
+
+    const els = {
+      navBtns: document.querySelectorAll('.nav-btn'),
+      sections: document.querySelectorAll('.section'),
+      invoiceForm: document.getElementById('invoiceForm'),
+      reagentForm: document.getElementById('reagentForm'),
+      orderForm: document.getElementById('orderForm'),
+      invoiceSearch: document.getElementById('invoiceSearch'),
+      invoiceStatusFilter: document.getElementById('invoiceStatusFilter'),
+      reagentSearch: document.getElementById('reagentSearch'),
+      reagentStatusFilter: document.getElementById('reagentStatusFilter'),
+      orderSearch: document.getElementById('orderSearch'),
+      orderStatusFilter: document.getElementById('orderStatusFilter'),
+      invoiceTableWrap: document.getElementById('invoiceTableWrap'),
+      reagentTableWrap: document.getElementById('reagentTableWrap'),
+      orderTableWrap: document.getElementById('orderTableWrap'),
+      statInvoices: document.getElementById('statInvoices'),
+      statPendingAmount: document.getElementById('statPendingAmount'),
+      statLowStock: document.getElementById('statLowStock'),
+      statOpenOrders: document.getElementById('statOpenOrders'),
+      recentInvoices: document.getElementById('recentInvoices'),
+      attentionReagents: document.getElementById('attentionReagents'),
+      exportBtn: document.getElementById('exportBtn'),
+      importInput: document.getElementById('importInput'),
+      resetBtn: document.getElementById('resetBtn'),
+      seedDemoBtn: document.getElementById('seedDemoBtn')
+    };
+
+    els.navBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        els.navBtns.forEach(b => b.classList.remove('active'));
+        els.sections.forEach(s => s.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.section).classList.add('active');
+      });
+    });
+
+    els.invoiceForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const form = new FormData(e.target);
+      state.invoices.unshift({
+        id: crypto.randomUUID(),
+        vendor: form.get('vendor').trim(),
+        invoiceNumber: form.get('invoiceNumber').trim(),
+        amount: Number(form.get('amount')),
+        invoiceDate: form.get('invoiceDate'),
+        dueDate: form.get('dueDate'),
+        status: form.get('status'),
+        notes: form.get('notes').trim(),
+        createdAt: new Date().toISOString()
+      });
+      saveState();
+      e.target.reset();
+      render();
+    });
+
+    els.reagentForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const form = new FormData(e.target);
+      const quantity = Number(form.get('quantity'));
+      const threshold = Number(form.get('threshold'));
+      let status = form.get('status');
+      if (quantity === 0) status = 'Out of Stock';
+      else if (quantity <= threshold && status === 'In Stock') status = 'Low Stock';
+
+      state.reagents.unshift({
+        id: crypto.randomUUID(),
+        name: form.get('name').trim(),
+        vendor: form.get('vendor').trim(),
+        catalogNumber: form.get('catalogNumber').trim(),
+        quantity,
+        unit: form.get('unit').trim(),
+        threshold,
+        expiration: form.get('expiration'),
+        storage: form.get('storage').trim(),
+        status,
+        notes: form.get('notes').trim(),
+        createdAt: new Date().toISOString()
+      });
+      saveState();
+      e.target.reset();
+      render();
+    });
+
+    els.orderForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const form = new FormData(e.target);
+      state.orders.unshift({
+        id: crypto.randomUUID(),
+        item: form.get('item').trim(),
+        vendor: form.get('vendor').trim(),
+        cost: Number(form.get('cost')),
+        requestDate: form.get('requestDate'),
+        status: form.get('status'),
+        requester: form.get('requester').trim(),
+        notes: form.get('notes').trim(),
+        createdAt: new Date().toISOString()
+      });
+      saveState();
+      e.target.reset();
+      render();
+    });
+
+    [
+      els.invoiceSearch, els.invoiceStatusFilter,
+      els.reagentSearch, els.reagentStatusFilter,
+      els.orderSearch, els.orderStatusFilter
+    ].forEach(el => el.addEventListener('input', render));
+
+    els.exportBtn.addEventListener('click', () => {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'lab-manager-portal-data.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    els.importInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      try {
+        const text = await file.text();
+        const parsed = JSON.parse(text);
+        if (!parsed.invoices || !parsed.reagents || !parsed.orders) throw new Error('Invalid file');
+        state.invoices = parsed.invoices;
+        state.reagents = parsed.reagents;
+        state.orders = parsed.orders;
+        saveState();
+        render();
+        alert('Data imported successfully.');
+      } catch (err) {
+        alert('Could not import that JSON file.');
+      } finally {
+        e.target.value = '';
+      }
+    });
+
+    els.resetBtn.addEventListener('click', () => {
+      const ok = confirm('This will delete all saved invoices, reagents, and orders in this browser. Continue?');
+      if (!ok) return;
+      state.invoices = [];
+      state.reagents = [];
+      state.orders = [];
+      saveState();
+      render();
+    });
+
+    els.seedDemoBtn.addEventListener('click', () => {
+      const ok = confirm('Load demo data into the app? Existing saved data will be replaced.');
+      if (!ok) return;
+      Object.assign(state, demoData());
+      saveState();
+      render();
+    });
+
+    function loadState() {
+      const raw = localStorage.getItem(storageKey);
+      if (!raw) return { invoices: [], reagents: [], orders: [] };
+      try {
+        const parsed = JSON.parse(raw);
+        return {
+          invoices: parsed.invoices || [],
+          reagents: parsed.reagents || [],
+          orders: parsed.orders || []
+        };
+      } catch {
+        return { invoices: [], reagents: [], orders: [] };
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem(storageKey, JSON.stringify(state));
+    }
+
+    function money(v) {
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(v || 0));
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '—';
+      const d = new Date(dateStr + 'T00:00:00');
+      return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+
+    function badgeClass(status) {
+      const map = {
+        'Paid': 'status-paid',
+        'Pending': 'status-pending',
+        'Overdue': 'status-overdue',
+        'In Stock': 'status-in-stock',
+        'Low Stock': 'status-low-stock',
+        'Out of Stock': 'status-out-of-stock',
+        'Ordered': 'status-ordered',
+        'Requested': 'status-pending',
+        'Received': 'status-paid',
+        'Cancelled': 'status-overdue'
+      };
+      return map[status] || 'status-pending';
+    }
+
+    function render() {
+      renderDashboard();
+      renderInvoices();
+      renderReagents();
+      renderOrders();
+    }
+
+    function renderDashboard() {
+      els.statInvoices.textContent = state.invoices.length;
+      const pendingAmount = state.invoices
+        .filter(i => i.status === 'Pending' || i.status === 'Overdue')
+        .reduce((sum, i) => sum + Number(i.amount || 0), 0);
+      els.statPendingAmount.textContent = money(pendingAmount);
+
+      const lowStock = state.reagents.filter(r => r.status === 'Low Stock' || r.status === 'Out of Stock' || Number(r.quantity) <= Number(r.threshold)).length;
+      els.statLowStock.textContent = lowStock;
+
+      const openOrders = state.orders.filter(o => o.status === 'Requested' || o.status === 'Ordered').length;
+      els.statOpenOrders.textContent = openOrders;
+
+      const recent = [...state.invoices].slice(0, 5);
+      els.recentInvoices.innerHTML = recent.length ? `
+        <table>
+          <thead><tr><th>Vendor</th><th>Invoice #</th><th>Amount</th><th>Status</th></tr></thead>
+          <tbody>
+            ${recent.map(i => `
+              <tr>
+                <td>${escapeHtml(i.vendor)}</td>
+                <td>${escapeHtml(i.invoiceNumber)}</td>
+                <td>${money(i.amount)}</td>
+                <td><span class="badge ${badgeClass(i.status)}">${escapeHtml(i.status)}</span></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>` : `<div class="empty">No invoices yet.</div>`;
+
+      const attention = state.reagents
+        .filter(r => r.status === 'Low Stock' || r.status === 'Out of Stock' || Number(r.quantity) <= Number(r.threshold))
+        .slice(0, 6);
+      els.attentionReagents.innerHTML = attention.length ? `
+        <table>
+          <thead><tr><th>Reagent</th><th>Qty</th><th>Threshold</th><th>Status</th></tr></thead>
+          <tbody>
+            ${attention.map(r => `
+              <tr>
+                <td>${escapeHtml(r.name)}</td>
+                <td>${escapeHtml(String(r.quantity))} ${escapeHtml(r.unit)}</td>
+                <td>${escapeHtml(String(r.threshold))}</td>
+                <td><span class="badge ${badgeClass(r.status)}">${escapeHtml(r.status)}</span></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>` : `<div class="empty">All reagents look sufficiently stocked.</div>`;
+    }
+
+    function renderInvoices() {
+      const q = els.invoiceSearch.value.trim().toLowerCase();
+      const status = els.invoiceStatusFilter.value;
+      const filtered = state.invoices.filter(i => {
+        const hay = `${i.vendor} ${i.invoiceNumber} ${i.notes}`.toLowerCase();
+        const matchesQuery = !q || hay.includes(q);
+        const matchesStatus = status === 'All' || i.status === status;
+        return matchesQuery && matchesStatus;
+      });
+
+      if (!filtered.length) {
+        els.invoiceTableWrap.innerHTML = `<div class="empty">No invoice records match your filters.</div>`;
+        return;
+      }
+
+      els.invoiceTableWrap.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Vendor</th>
+              <th>Invoice #</th>
+              <th>Amount</th>
+              <th>Invoice date</th>
+              <th>Due date</th>
+              <th>Status</th>
+              <th>Notes</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${filtered.map(i => `
+              <tr>
+                <td>${escapeHtml(i.vendor)}</td>
+                <td>${escapeHtml(i.invoiceNumber)}</td>
+                <td>${money(i.amount)}</td>
+                <td>${formatDate(i.invoiceDate)}</td>
+                <td>${formatDate(i.dueDate)}</td>
+                <td><span class="badge ${badgeClass(i.status)}">${escapeHtml(i.status)}</span></td>
+                <td>${escapeHtml(i.notes || '—')}</td>
+                <td><button class="btn btn-danger" onclick="removeItem('invoices','${i.id}')">Delete</button></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function renderReagents() {
+      const q = els.reagentSearch.value.trim().toLowerCase();
+      const status = els.reagentStatusFilter.value;
+      const filtered = state.reagents.filter(r => {
+        const hay = `${r.name} ${r.vendor} ${r.catalogNumber} ${r.notes}`.toLowerCase();
+        const matchesQuery = !q || hay.includes(q);
+        const matchesStatus = status === 'All' || r.status === status;
+        return matchesQuery && matchesStatus;
+      });
+
+      if (!filtered.length) {
+        els.reagentTableWrap.innerHTML = `<div class="empty">No reagent records match your filters.</div>`;
+        return;
+      }
+
+      els.reagentTableWrap.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Reagent</th>
+              <th>Vendor</th>
+              <th>Catalog #</th>
+              <th>Qty</th>
+              <th>Threshold</th>
+              <th>Expiration</th>
+              <th>Storage</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${filtered.map(r => `
+              <tr>
+                <td>
+                  <div>${escapeHtml(r.name)}</div>
+                  <div class="muted">${escapeHtml(r.notes || '')}</div>
+                </td>
+                <td>${escapeHtml(r.vendor)}</td>
+                <td>${escapeHtml(r.catalogNumber || '—')}</td>
+                <td>${escapeHtml(String(r.quantity))} ${escapeHtml(r.unit)}</td>
+                <td>${escapeHtml(String(r.threshold))}</td>
+                <td>${formatDate(r.expiration)}</td>
+                <td>${escapeHtml(r.storage || '—')}</td>
+                <td><span class="badge ${badgeClass(r.status)}">${escapeHtml(r.status)}</span></td>
+                <td><button class="btn btn-danger" onclick="removeItem('reagents','${r.id}')">Delete</button></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function renderOrders() {
+      const q = els.orderSearch.value.trim().toLowerCase();
+      const status = els.orderStatusFilter.value;
+      const filtered = state.orders.filter(o => {
+        const hay = `${o.item} ${o.vendor} ${o.requester} ${o.notes}`.toLowerCase();
+        const matchesQuery = !q || hay.includes(q);
+        const matchesStatus = status === 'All' || o.status === status;
+        return matchesQuery && matchesStatus;
+      });
+
+      if (!filtered.length) {
+        els.orderTableWrap.innerHTML = `<div class="empty">No purchase orders match your filters.</div>`;
+        return;
+      }
+
+      els.orderTableWrap.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Vendor</th>
+              <th>Estimated cost</th>
+              <th>Request date</th>
+              <th>Status</th>
+              <th>Requested by</th>
+              <th>Notes</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${filtered.map(o => `
+              <tr>
+                <td>${escapeHtml(o.item)}</td>
+                <td>${escapeHtml(o.vendor)}</td>
+                <td>${money(o.cost)}</td>
+                <td>${formatDate(o.requestDate)}</td>
+                <td><span class="badge ${badgeClass(o.status)}">${escapeHtml(o.status)}</span></td>
+                <td>${escapeHtml(o.requester || '—')}</td>
+                <td>${escapeHtml(o.notes || '—')}</td>
+                <td><button class="btn btn-danger" onclick="removeItem('orders','${o.id}')">Delete</button></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    window.removeItem = function(collection, id) {
+      state[collection] = state[collection].filter(item => item.id !== id);
+      saveState();
+      render();
+    }
+
+    function demoData() {
+      return {
+        invoices: [
+          { id: crypto.randomUUID(), vendor: 'Thermo Fisher', invoiceNumber: 'TF-28194', amount: 1248.50, invoiceDate: '2026-04-10', dueDate: '2026-05-10', status: 'Pending', notes: 'qPCR master mix and pipette tips', createdAt: new Date().toISOString() },
+          { id: crypto.randomUUID(), vendor: 'VWR', invoiceNumber: 'VWR-11802', amount: 632.12, invoiceDate: '2026-04-08', dueDate: '2026-04-20', status: 'Overdue', notes: 'Cell culture plastics', createdAt: new Date().toISOString() },
+          { id: crypto.randomUUID(), vendor: 'IDT', invoiceNumber: 'IDT-99017', amount: 2890.00, invoiceDate: '2026-04-01', dueDate: '2026-04-18', status: 'Paid', notes: 'Custom oligos and adapters', createdAt: new Date().toISOString() }
+        ],
+        reagents: [
+          { id: crypto.randomUUID(), name: 'Triton X-100', vendor: 'Sigma', catalogNumber: 'T8787', quantity: 1, unit: 'bottle', threshold: 2, expiration: '2027-01-18', storage: 'RT', status: 'Low Stock', notes: 'Used for nuclei lysis workflow', createdAt: new Date().toISOString() },
+          { id: crypto.randomUUID(), name: 'Normal Goat Serum', vendor: 'Cell Signaling', catalogNumber: '5425', quantity: 4, unit: 'vials', threshold: 2, expiration: '2026-11-10', storage: '-20°C', status: 'In Stock', notes: 'IF blocking buffer', createdAt: new Date().toISOString() },
+          { id: crypto.randomUUID(), name: 'DAPI', vendor: 'Thermo Fisher', catalogNumber: 'D1306', quantity: 0, unit: 'tube', threshold: 1, expiration: '2026-08-30', storage: '4°C', status: 'Out of Stock', notes: 'Need reorder for imaging', createdAt: new Date().toISOString() }
+        ],
+        orders: [
+          { id: crypto.randomUUID(), item: 'AMPure XP beads', vendor: 'Beckman Coulter', cost: 468.00, requestDate: '2026-04-15', status: 'Ordered', requester: 'Alex', notes: 'For library cleanup workflow', createdAt: new Date().toISOString() },
+          { id: crypto.randomUUID(), item: '96-well chamber slides', vendor: 'ibidi', cost: 219.00, requestDate: '2026-04-18', status: 'Requested', requester: 'Alex', notes: 'For IF stain optimization', createdAt: new Date().toISOString() }
+        ]
+      };
+    }
+
+    render();
+  </script>
+</body>
+</html>
